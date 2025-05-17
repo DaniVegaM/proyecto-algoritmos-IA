@@ -293,7 +293,7 @@ class GreedyBacktrackCitySelector(tk.Toplevel):
         GreedyBacktrackVisualizer(root, path, cost, steps, f"Greedy + Retroceso: {start} → {goal}", start, goal)
 
 root = tk.Tk()
-root.title("Menú Principal - Ice World")
+root.title("Menú Principal - Proyecto IA")
 root.geometry("400x300")
 
 label = tk.Label(root, text="Elige una opción de juego:", font=("Arial", 16))
