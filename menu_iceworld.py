@@ -1,8 +1,10 @@
 import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from tkinter import messagebox
 from iceworld_core import IceWorld, bfs, dfs, GridVisualizer
 from iceworld_core import TreeVisualizer
-from hill_climbing_romania import hill_climbing, HillClimbingVisualizer, romania_map
+from hill_climbing_romania import hill_climbing, HillClimbingVisualizer, romania_map, hill_climbing_gn
 from a_star_romania import a_star, AStarVisualizer
 from greedy_romania import greedy_search, GreedyVisualizer
 from greedy_romania import greedy_search_backtracking, GreedyBacktrackVisualizer
@@ -26,9 +28,12 @@ def jugar_hill_climbing():
     # Permite al usuario seleccionar inicio y meta con dos clics
     selector = CitySelector(root)
 
+def jugar_hill_climbing_gn():
+    selctor = HillClimbingGn(root)
+
 def jugar_minimax():
     MinimaxVisualizer()
-    
+
 
 
 class CitySelector(tk.Toplevel):
@@ -96,6 +101,71 @@ class CitySelector(tk.Toplevel):
         self.destroy()
         path = hill_climbing(start, goal)
         HillClimbingVisualizer(root, path, f"Hill Climbing: {start} → {goal}", start, goal)
+
+                # Generar gráfica de pesos acumulados
+        weights = []
+        total_cost = 0
+        for i in range(len(path) - 1):
+            city = path[i]
+            next_city = path[i+1]
+            for neighbor, cost in romania_map[city]:
+                if neighbor == next_city:
+                    total_cost += cost
+                    weights.append(total_cost)
+                    break
+
+        if weights:
+            fig = Figure(figsize=(5, 3), dpi=100)
+            ax = fig.add_subplot(111)
+            ax.plot(range(1, len(weights)+1), weights, marker='o', color='#1976d2')
+            ax.set_title("Costo acumulado del camino")
+            ax.set_xlabel("Paso")
+            ax.set_ylabel("Costo")
+            ax.grid(True)
+
+            # Crear nueva ventana con la gráfica
+            grafica = tk.Toplevel(self.master)
+            grafica.title("Gráfica de costo acumulado")
+            canvas = FigureCanvasTkAgg(fig, master=grafica)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+
+class HillClimbingGn(CitySelector):
+    def run_hill_climbing(self):
+        start, goal = self.selected
+        self.destroy()
+        path = hill_climbing_gn(start, goal)
+        HillClimbingVisualizer(root, path, f"Hill Climbing: {start} → {goal}", start, goal)
+
+                # Generar gráfica de pesos acumulados
+        weights = []
+        total_cost = 0
+        for i in range(len(path) - 1):
+            city = path[i]
+            next_city = path[i+1]
+            for neighbor, cost in romania_map[city]:
+                if neighbor == next_city:
+                    total_cost += cost
+                    weights.append(total_cost)
+                    break
+
+        if weights:
+            fig = Figure(figsize=(5, 3), dpi=100)
+            ax = fig.add_subplot(111)
+            ax.plot(range(1, len(weights)+1), weights, marker='o', color='#1976d2')
+            ax.set_title("Costo acumulado del camino")
+            ax.set_xlabel("Paso")
+            ax.set_ylabel("Costo")
+            ax.grid(True)
+
+            # Crear nueva ventana con la gráfica
+            grafica = tk.Toplevel(self.master)
+            grafica.title("Gráfica de costo acumulado")
+            canvas = FigureCanvasTkAgg(fig, master=grafica)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+
+
 
 def jugar_a_star():
     selector = AStarCitySelector(root)
@@ -300,30 +370,33 @@ class GreedyBacktrackCitySelector(tk.Toplevel):
 
 root = tk.Tk()
 root.title("Menú Principal - Proyecto IA")
-root.geometry("400x300")
+root.geometry("400x600")
 
 label = tk.Label(root, text="Elige una opción de juego:", font=("Arial", 16))
 label.pack(pady=30)
 
-btn_bfs = tk.Button(root, text="Jugar Ice World (BFS)", font=("Arial", 14), width=25, command=jugar_bfs)
+btn_bfs = tk.Button(root, text="Jugar Ice World (BFS)", font=("Arial", 14), width=30, command=jugar_bfs)
 btn_bfs.pack(pady=10)
 
-btn_dfs = tk.Button(root, text="Jugar Ice World (DFS)", font=("Arial", 14), width=25, command=jugar_dfs)
+btn_dfs = tk.Button(root, text="Jugar Ice World (DFS)", font=("Arial", 14), width=30, command=jugar_dfs)
 btn_dfs.pack(pady=10)
 
-btn_hc = tk.Button(root, text="Hill Climbing (Mapa de Rumania)", font=("Arial", 14), width=25, command=jugar_hill_climbing)
+btn_hc = tk.Button(root, text="Hill Climbing (Mapa de Rumania) h(n)", font=("Arial", 14), width=30, command=jugar_hill_climbing)
 btn_hc.pack(pady=10)
 
-btn_astar = tk.Button(root, text="A* (Mapa de Rumania)", font=("Arial", 14), width=25, command=jugar_a_star)
+btn_hcgn = tk.Button(root, text="Hill Climbing (Mapa de Rumania) g(n)", font=("Arial", 14), width=30, command=jugar_hill_climbing_gn)
+btn_hcgn.pack(pady=10)
+
+btn_astar = tk.Button(root, text="A* (Mapa de Rumania)", font=("Arial", 14), width=30, command=jugar_a_star)
 btn_astar.pack(pady=10)
 
-btn_greedy = tk.Button(root, text="Greedy (Mapa de Rumania)", font=("Arial", 14), width=25, command=jugar_greedy)
+btn_greedy = tk.Button(root, text="Greedy (Mapa de Rumania)", font=("Arial", 14), width=30, command=jugar_greedy)
 btn_greedy.pack(pady=10)
 
-btn_greedy_bt = tk.Button(root, text="Greedy+Retroceso (Rumania)", font=("Arial", 14), width=25, command=jugar_greedy_backtracking)
+btn_greedy_bt = tk.Button(root, text="Greedy+Retroceso (Rumania)", font=("Arial", 14), width=30, command=jugar_greedy_backtracking)
 btn_greedy_bt.pack(pady=10)
 
-btn_minimax = tk.Button(root, text="Minimax (Gato)", font=("Arial", 14), width=25, command=jugar_minimax)
+btn_minimax = tk.Button(root, text="Minimax (Gato)", font=("Arial", 14), width=30, command=jugar_minimax)
 btn_minimax.pack(pady=10)
 
 root.mainloop()

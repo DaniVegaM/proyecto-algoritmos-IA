@@ -111,3 +111,31 @@ def hill_climbing(start, goal):
         current = next_city
         path.append(current)
     return path
+
+def hill_climbing_gn(start, goal):
+    stack = [(start, 0)]
+    visited = set()
+    path = []
+
+    while stack:
+        current, cost = stack.pop()
+        path.append(current)
+        visited.add(current)
+
+        if current == goal:
+            return path
+        
+        neighbors = romania_map.get(current, [])
+        # Filtrar vecinos no visitados
+        neighbors_no_visited = [(v, c) for v, c in neighbors if v not in visited]
+
+        if not neighbors_no_visited:
+            path.pop()
+            continue
+
+        next_city = min(neighbors_no_visited, key=lambda x: x[1])
+        stack.append((current, cost))
+        stack.append((next_city[0], cost + next_city[1]))
+    return path
+
+    
