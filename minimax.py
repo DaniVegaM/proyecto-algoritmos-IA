@@ -24,6 +24,9 @@ class TicTacToe:
         self.board = [["" for _ in range(3)] for _ in range(3)]
         self.draw_board()
 
+        self.result_label = tk.Label(self.window, text="", font=("Arial", 14))
+        self.result_label.grid(row=1, column=0, columnspan=2, pady=5)
+
     def draw_board(self):
         self.canvas.delete("all")
         for i in range(1, 3):
@@ -52,14 +55,40 @@ class TicTacToe:
             self.board[row][col] = "X"
             self.draw_board()
 
-            if not self.check_winner(self.board) and not self.is_full(self.board):
-                _, move, tree = self.minimax(self.board, False)
-                if move:
-                    r, c = move
-                    self.board[r][c] = "O"
-                    self.draw_board()
-                self.tree_text.delete("1.0", tk.END)
-                self.display_tree(tree)
+            winner = self.check_winner(self.board)
+            if winner:
+                self.end_game(f"Ganaste")
+                return
+            elif self.is_full(self.board):
+                self.end_game("Empate")
+                return
+
+            _, move, tree = self.minimax(self.board, False)
+            if move:
+                r, c = move
+                self.board[r][c] = "O"
+                self.draw_board()
+
+            winner = self.check_winner(self.board)
+            if winner:
+                self.end_game(f"Perdiste")
+                return
+            elif self.is_full(self.board):
+                self.end_game("Empate")
+                return
+
+            self.tree_text.delete("1.0", tk.END)
+            self.display_tree(tree)
+
+    def end_game(self, result):
+        self.result_label.config(text=f"{result}. Reiniciando en 5 segundos...")
+        self.window.after(5000, self.reset_game)
+
+    def reset_game(self):
+        self.board = [["" for _ in range(3)] for _ in range(3)]
+        self.tree_text.delete("1.0", tk.END)
+        self.result_label.config(text="")
+        self.draw_board()
 
     def minimax(self, board, is_maximizing):
         winner = self.check_winner(board)
