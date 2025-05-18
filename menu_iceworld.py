@@ -234,6 +234,34 @@ class AStarCitySelector(tk.Toplevel):
         path, cost = a_star(start, goal)
         AStarVisualizer(root, path, cost, f"A*: {start} → {goal}", start, goal)
 
+                 # Generar gráfica de pesos acumulados
+        weights = []
+        total_cost = 0
+        for i in range(len(path) - 1):
+            city = path[i]
+            next_city = path[i+1]
+            for neighbor, cost in romania_map[city]:
+                if neighbor == next_city:
+                    total_cost += cost
+                    weights.append(total_cost)
+                    break
+
+        if weights:
+            fig = Figure(figsize=(5, 3), dpi=100)
+            ax = fig.add_subplot(111)
+            ax.plot(range(1, len(weights)+1), weights, marker='o', color='#1976d2')
+            ax.set_title("Costo acumulado del camino")
+            ax.set_xlabel("Paso")
+            ax.set_ylabel("Costo")
+            ax.grid(True)
+
+            # Crear nueva ventana con la gráfica
+            grafica = tk.Toplevel(self.master)
+            grafica.title("Gráfica de costo acumulado")
+            canvas = FigureCanvasTkAgg(fig, master=grafica)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+
 def jugar_greedy():
     selector = GreedyCitySelector(root)
 
