@@ -6,6 +6,7 @@ from hill_climbing_romania import hill_climbing, HillClimbingVisualizer, romania
 from a_star_romania import a_star, AStarVisualizer
 from greedy_romania import greedy_search, GreedyVisualizer
 from greedy_romania import greedy_search_backtracking, GreedyBacktrackVisualizer
+from minimax import MinimaxVisualizer, MinimaxNode, TicTacToe
 
 def jugar_bfs():
     holes = [(2,4), (3,1), (1,4), (4,4)]
@@ -24,6 +25,11 @@ def jugar_dfs():
 def jugar_hill_climbing():
     # Permite al usuario seleccionar inicio y meta con dos clics
     selector = CitySelector(root)
+
+def jugar_minimax():
+    MinimaxVisualizer()
+    
+
 
 class CitySelector(tk.Toplevel):
     def __init__(self, master):
@@ -316,5 +322,8 @@ btn_greedy.pack(pady=10)
 
 btn_greedy_bt = tk.Button(root, text="Greedy+Retroceso (Rumania)", font=("Arial", 14), width=25, command=jugar_greedy_backtracking)
 btn_greedy_bt.pack(pady=10)
+
+btn_minimax = tk.Button(root, text="Minimax (Gato)", font=("Arial", 14), width=25, command=jugar_minimax)
+btn_minimax.pack(pady=10)
 
 root.mainloop()
